@@ -29,7 +29,7 @@ document.addEventListener('keydown', event => {
   }
 });
 document.addEventListener('click', event => { if (!event.target.closest('.site-header')) closeMenu(); });
-matchMedia('(min-width: 761px)').addEventListener('change', closeMenu);
+matchMedia('(min-width: 801px)').addEventListener('change', closeMenu);
 
 const form = document.querySelector('#contact-form');
 const status = document.querySelector('#form-status');
@@ -131,3 +131,45 @@ if ('IntersectionObserver' in window) {
   observer.observe(document.querySelector('.hero'));
   observer.observe(document.querySelector('#contact'));
 }
+
+// Content stays visible without JavaScript; only off-screen sections reveal.
+if ('IntersectionObserver' in window) {
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.remove('is-pending');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(element => {
+    if (element.getBoundingClientRect().top > innerHeight && !motionPreference.matches) {
+      element.classList.add('is-pending');
+      revealObserver.observe(element);
+    }
+  });
+  const ticker = document.querySelector('.ticker');
+  new IntersectionObserver(entries => {
+    ticker.dataset.motionVisible = String(entries[0].isIntersecting);
+  }).observe(ticker);
+}
+// One requestAnimationFrame at most per scroll event. Desktop only.
+const demoImage = document.querySelector('.demo-visual');
+const wideScreen = matchMedia('(min-width: 801px)');
+let scrollPending = false;
+function updateScrollArt() {
+  scrollPending = false;
+  if (userPaused || motionPreference.matches || !wideScreen.matches) {
+    demoImage.style.removeProperty('--image-scale');
+    return;
+  }
+  const box = demoImage.getBoundingClientRect();
+  if (box.bottom < 0 || box.top > innerHeight) return;
+  const progress = Math.max(0, Math.min(1, (innerHeight - box.top) / (innerHeight + box.height)));
+  demoImage.style.setProperty('--image-scale', String(1.035 - progress * 0.035));
+}
+addEventListener('scroll', () => {
+  if (!scrollPending) { scrollPending = true; requestAnimationFrame(updateScrollArt); }
+}, { passive: true });
+wideScreen.addEventListener('change', updateScrollArt);
+motionPreference.addEventListener('change', updateScrollArt);

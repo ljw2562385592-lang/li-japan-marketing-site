@@ -6,7 +6,12 @@ for(const [,value] of html.matchAll(/data-service="([^"]+)"/g)) assert(options.i
 for(const name of ['店舗集客診断','SNS Content Test','Creator PR Test']) assert(options.includes(name));
 assert(html.includes('2〜4ページ')&&html.includes('優先して取り組む3つ'));
 assert(!html.includes('RED MARKETING PARTNER'));
-assert(!html.includes('中国の制作チーム'));
 assert(html.includes('id="about"')&&html.includes('<dd>李</dd>'));
-assert.equal(new Set([...html.matchAll(/assets\/rikomoko-(research|content|social|photography)\.png/g)].map(m=>m[1])).size,4);
-console.log('OK: three entry offers, consultation routing, four scene assets, About and positioning.');
+assert(options.includes('無料店舗診断'));
+assert(html.includes('初回・簡易診断') && html.includes('情報更新・制作・運用は含みません'));
+for (const id of ['goals','approach','services','growth','channels','samples','creator','process','pricing','insights','about','faq','contact']) assert(html.includes(`id="${id}"`));
+assert(html.includes('実在店舗の診断・受託実績・成果ではありません'));
+assert.equal((html.match(/class="goal /g)||[]).length,5);
+assert.equal((html.match(/class="cap-row reveal"/g)||[]).length,5);
+assert(html.includes('サイトから自動送信・保存はされません'));
+console.log('OK: goal routing, five capabilities, free diagnostic scope, three offers, honest demo, About, email-draft flow.');
