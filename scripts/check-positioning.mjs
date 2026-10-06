@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const html=fs.readFileSync('index.html','utf8');
+const options=[...html.matchAll(/<option>(.*?)<\/option>/g)].map(m=>m[1]);
+for(const [,value] of html.matchAll(/data-service="([^"]+)"/g)) assert(options.includes(value),`Consultation option missing: ${value}`);
+for(const name of ['店舗集客診断','SNS Content Test','Creator PR Test']) assert(options.includes(name));
+assert(html.includes('2〜4ページ')&&html.includes('優先して取り組む3つ'));
+assert(!html.includes('RED MARKETING PARTNER'));
+assert(!html.includes('中国の制作チーム'));
+assert(html.includes('id="about"')&&html.includes('<dd>李</dd>'));
+assert.equal(new Set([...html.matchAll(/assets\/rikomoko-(research|content|social|photography)\.png/g)].map(m=>m[1])).size,4);
+console.log('OK: three entry offers, consultation routing, four scene assets, About and positioning.');

@@ -1,0 +1,11 @@
+import { readFile, access } from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const html = await readFile('index.html', 'utf8');
+const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
+assert.equal(new Set(ids).size, ids.length, 'HTML IDs must be unique');
+for (const [, id] of html.matchAll(/href="#([^"]+)"/g)) assert(ids.includes(id), `Missing anchor: ${id}`);
+for (const [, file] of html.matchAll(/(?:src|href)="\.\/([^"]+)"/g)) await access(file);
+for (const [, id] of html.matchAll(/aria-(?:controls|labelledby)="([^"]+)"/g)) assert(ids.includes(id), `Missing ARIA target: ${id}`);
+assert(html.includes('lang="ja"'), 'Japanese document language required');
+assert(!/https?:\/\//.test(html), 'Page should work without external asset dependencies');
+console.log('OK: anchors, IDs, accessibility references, local assets, document language.');

@@ -1,0 +1,7 @@
+{
+  "name": "rikomoko-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RIKOMOKO corporate website — static and GitHub Pages ready",
+  "scripts": { "dev": "node scripts/serve.mjs", "check": "node --check app.js && node --check site-config.js && node scripts/check.mjs" }
+}
